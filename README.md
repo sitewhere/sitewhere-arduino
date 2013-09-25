@@ -1,4 +1,4 @@
-sitewhere-arduino
-=================
+SiteWhere Arduino Libraries
+===========================
 
-Library that simplify sending data to SiteWhere from &lt;a href="http://www.arduino.cc/">Arduino&lt;/a> hardware.
+Library that simplifies sending data to SiteWhere from [Arduino](http://www.arduino.cc/ "Arduino") hardware.
