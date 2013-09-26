@@ -106,3 +106,35 @@ void DeviceLocation::getJSON(char* message) {
 			"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
 			strLatitude, strLongitude, strElevation);
 }
+
+/**
+ * Create a device measurement.
+ */
+DeviceMeasurement::DeviceMeasurement(char* name, char* value, time_t eventDate) :
+		DeviceEvent(eventDate) {
+	this->_measurementName = name;
+	this->_measurementValue = value;
+}
+
+/**
+ * Get the measurement name.
+ */
+char* DeviceMeasurement::getMeasurementName() {
+	return this->_measurementName;
+}
+
+/**
+ * Get the measurement value.
+ */
+char* DeviceMeasurement::getMeasurementValue() {
+	return this->_measurementValue;
+}
+
+/**
+ * Get a JSON representation of the measurement.
+ */
+void DeviceMeasurement::getJSON(char* message) {
+	sprintf(message,
+			"{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
+			this->_measurementName, this->_measurementValue);
+}

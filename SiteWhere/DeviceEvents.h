@@ -50,4 +50,18 @@ protected:
 	double _elevation;
 };
 
+/**
+ * Class for SiteWhere device measurements data.
+ */
+class DeviceMeasurement: protected DeviceEvent {
+public:
+	DeviceMeasurement(char* name, char* value, time_t eventDate);
+	char* getMeasurementName();
+	char* getMeasurementValue();
+	void getJSON(char* message);
+protected:
+	char* _measurementName;
+	char* _measurementValue;
+};
+
 #endif

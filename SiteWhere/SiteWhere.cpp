@@ -52,6 +52,22 @@ boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
 }
 
 /**
+ * Send a device measurement to the given topic on the MQTT broker.
+ */
+boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId,
+		DeviceMeasurement& measurement) {
+	if (_mqtt->connected()) {
+		char json[MAX_JSON_SIZE];
+		measurement.getJSON(json);
+		char message[MAX_MQTT_PAYLOAD_SIZE];
+		sprintf(message, "{\"hardwareId\":\"%s\",\"measurements\":[%s]}",
+				hardwareId, json);
+		return _mqtt->publish(topic, message);
+	}
+	return false;
+}
+
+/**
  * Handle processing loop for receiving messages on the socket.
  */
 boolean SiteWhere::loop() {
@@ -65,12 +81,3 @@ void SiteWhere::onResponseMessage(char* topic, byte* payload,
 		unsigned int length) {
 }
 
-/**
- * Sends the length of a string to the serial port.
- */
-void SiteWhere::debugStringLength(char* label, char* message) {
-	int length = strlen(message);
-	char debug[32];
-	sprintf(debug, "Length of %s is: %d", label, length);
-	Serial.println(debug);
-}

@@ -19,11 +19,11 @@ class SiteWhere {
 		boolean connect(char* clientId);
 		boolean sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert);
 		boolean sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location);
+		boolean sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement);
 		boolean loop();
 	private:
 		Client* _client;
 		PubSubClient* _mqtt;
-		void debugStringLength(char* label, char* message);
 		static void onResponseMessage(char* topic, byte* payload, unsigned int length);
 };
 
