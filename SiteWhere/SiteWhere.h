@@ -8,11 +8,13 @@
 #include <Arduino.h>
 #include <Client.h>
 #include <PubSubClient.h>
+#include "DeviceEvents.h"
 
 class SiteWhere {
 	public:
 		SiteWhere(Client& client, uint8_t* mqttIp, uint16_t mqttPort);
 		boolean connect(char* clientId);
+		boolean sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert);
 		boolean loop();
 	private:
 		Client* _client;
