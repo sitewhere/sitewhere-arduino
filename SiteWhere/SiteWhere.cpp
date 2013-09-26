@@ -22,10 +22,14 @@ boolean SiteWhere::connect(char* clientId) {
 /**
  * Send a device alert to the given topic on the MQTT broker.
  */
-boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert) {
+boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
+		DeviceAlert& alert) {
 	if (_mqtt->connected()) {
 		char* json = alert.getJSON();
-		return _mqtt->publish(topic, json);
+		char message[MAX_MQTT_MESSAGE_SIZE];
+		sprintf(message, "{\"hardwareId\": \"%s\", \"alerts\": [%s]}", hardwareId,
+				json);
+		return _mqtt->publish(topic, message);
 	}
 	return false;
 }

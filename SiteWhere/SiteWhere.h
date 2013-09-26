@@ -10,6 +10,8 @@
 #include <PubSubClient.h>
 #include "DeviceEvents.h"
 
+#define MAX_MQTT_MESSAGE_SIZE 256
+
 class SiteWhere {
 	public:
 		SiteWhere(Client& client, uint8_t* mqttIp, uint16_t mqttPort);
