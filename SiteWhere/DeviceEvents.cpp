@@ -2,6 +2,7 @@
  * Implementation class for SiteWhere device events.
  */
 #include "DeviceEvents.h"
+#include "SiteWhere.h"
 #include <Stdio.h>
 
 /**
@@ -44,10 +45,64 @@ char* DeviceAlert::getAlertMessage() {
 /**
  * Get a JSON representation of the alert.
  */
-char* DeviceAlert::getJSON() {
-	char message[256];
+void DeviceAlert::getJSON(char* message) {
 	sprintf(message,
-			"{\"type\": \"%s\", \"message\": \"%s\", \"eventDate\": \"2013-09-26T06:40:30.362Z\", \"metadata\": []}",
+			"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
 			this->_alertType, this->_alertMessage);
-	return message;
+}
+
+/**
+ * Create a device location based on latitude and longitude.
+ */
+DeviceLocation::DeviceLocation(double latitude, double longitude,
+		time_t eventDate) :
+		DeviceEvent(eventDate) {
+	this->_latitude = latitude;
+	this->_longitude = longitude;
+	this->_elevation = 0;
+}
+
+/**
+ * Create a device alert.
+ */
+DeviceLocation::DeviceLocation(double latitude, double longitude,
+		double elevation, time_t eventDate) :
+		DeviceEvent(eventDate) {
+	this->_latitude = latitude;
+	this->_longitude = longitude;
+	this->_elevation = elevation;
+}
+
+/**
+ * Get the location latitude.
+ */
+double DeviceLocation::getLatitude() {
+	return this->_latitude;
+}
+
+/**
+ * Get the location longitude.
+ */
+double DeviceLocation::getLongitude() {
+	return this->_longitude;
+}
+
+/**
+ * Get the location elevation.
+ */
+double DeviceLocation::getElevation() {
+	return this->_elevation;
+}
+
+/**
+ * Get a JSON representation of the location.
+ */
+void DeviceLocation::getJSON(char* message) {
+	char strLatitude[16], strLongitude[16], strElevation[16];
+	dtostrf(this->_latitude, 10, 8, strLatitude);
+	dtostrf(this->_longitude, 10, 8, strLongitude);
+	dtostrf(this->_elevation, 10, 8, strElevation);
+	sprintf(message,
+			"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
+			strLatitude, strLongitude, strElevation);
 }

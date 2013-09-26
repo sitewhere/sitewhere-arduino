@@ -7,12 +7,14 @@
 #######################################
 SiteWhere	KEYWORD1
 DeviceAlert	KEYWORD1
+DeviceLocation	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 connect	KEYWORD2
 sendDeviceAlert	KEYWORD2
+sendDeviceLocation	KEYWORD2
 loop	KEYWORD2
 
 #######################################

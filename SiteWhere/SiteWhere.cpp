@@ -25,10 +25,27 @@ boolean SiteWhere::connect(char* clientId) {
 boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
 		DeviceAlert& alert) {
 	if (_mqtt->connected()) {
-		char* json = alert.getJSON();
-		char message[MAX_MQTT_MESSAGE_SIZE];
-		sprintf(message, "{\"hardwareId\": \"%s\", \"alerts\": [%s]}", hardwareId,
-				json);
+		char json[MAX_JSON_SIZE];
+		alert.getJSON(json);
+		char message[MAX_MQTT_PAYLOAD_SIZE];
+		sprintf(message, "{\"hardwareId\":\"%s\",\"alerts\":[%s]}",
+				hardwareId, json);
+		return _mqtt->publish(topic, message);
+	}
+	return false;
+}
+
+/**
+ * Send a device location to the given topic on the MQTT broker.
+ */
+boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
+		DeviceLocation& location) {
+	if (_mqtt->connected()) {
+		char json[MAX_JSON_SIZE];
+		location.getJSON(json);
+		char message[MAX_MQTT_PAYLOAD_SIZE];
+		sprintf(message, "{\"hardwareId\":\"%s\",\"locations\":[%s]}",
+				hardwareId, json);
 		return _mqtt->publish(topic, message);
 	}
 	return false;
@@ -46,4 +63,14 @@ boolean SiteWhere::loop() {
  */
 void SiteWhere::onResponseMessage(char* topic, byte* payload,
 		unsigned int length) {
+}
+
+/**
+ * Sends the length of a string to the serial port.
+ */
+void SiteWhere::debugStringLength(char* label, char* message) {
+	int length = strlen(message);
+	char debug[32];
+	sprintf(debug, "Length of %s is: %d", label, length);
+	Serial.println(debug);
 }
