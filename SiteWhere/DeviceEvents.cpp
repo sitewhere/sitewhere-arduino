@@ -6,23 +6,24 @@
 #include <Stdio.h>
 
 /**
- * Base constructor for device events.
+ * Base constructor for device events. Event date is expected to be in the format of
+ * an ISO 8601 date string (e.g. 2013-09-29T10:40Z).
  */
-DeviceEvent::DeviceEvent(time_t eventDate) {
+DeviceEvent::DeviceEvent(char* eventDate) {
 	this->_eventDate = eventDate;
 }
 
 /**
  * Get the event date.
  */
-time_t DeviceEvent::getEventDate() {
+char* DeviceEvent::getEventDate() {
 	return this->_eventDate;
 }
 
 /**
  * Create a device alert.
  */
-DeviceAlert::DeviceAlert(char* type, char* message, time_t eventDate) :
+DeviceAlert::DeviceAlert(char* type, char* message, char* eventDate) :
 		DeviceEvent(eventDate) {
 	this->_alertType = type;
 	this->_alertMessage = message;
@@ -47,15 +48,15 @@ char* DeviceAlert::getAlertMessage() {
  */
 void DeviceAlert::getJSON(char* message) {
 	sprintf(message,
-			"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
-			this->_alertType, this->_alertMessage);
+			"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}",
+			this->_alertType, this->_alertMessage, this->getEventDate());
 }
 
 /**
  * Create a device location based on latitude and longitude.
  */
 DeviceLocation::DeviceLocation(double latitude, double longitude,
-		time_t eventDate) :
+		char* eventDate) :
 		DeviceEvent(eventDate) {
 	this->_latitude = latitude;
 	this->_longitude = longitude;
@@ -66,7 +67,7 @@ DeviceLocation::DeviceLocation(double latitude, double longitude,
  * Create a device alert.
  */
 DeviceLocation::DeviceLocation(double latitude, double longitude,
-		double elevation, time_t eventDate) :
+		double elevation, char* eventDate) :
 		DeviceEvent(eventDate) {
 	this->_latitude = latitude;
 	this->_longitude = longitude;
@@ -103,14 +104,14 @@ void DeviceLocation::getJSON(char* message) {
 	dtostrf(this->_longitude, 10, 8, strLongitude);
 	dtostrf(this->_elevation, 10, 8, strElevation);
 	sprintf(message,
-			"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
-			strLatitude, strLongitude, strElevation);
+			"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}",
+			strLatitude, strLongitude, strElevation, this->getEventDate());
 }
 
 /**
  * Create a device measurement.
  */
-DeviceMeasurement::DeviceMeasurement(char* name, char* value, time_t eventDate) :
+DeviceMeasurement::DeviceMeasurement(char* name, char* value, char* eventDate) :
 		DeviceEvent(eventDate) {
 	this->_measurementName = name;
 	this->_measurementValue = value;
@@ -135,6 +136,6 @@ char* DeviceMeasurement::getMeasurementValue() {
  */
 void DeviceMeasurement::getJSON(char* message) {
 	sprintf(message,
-			"{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"2013-09-26T06:40:30.362Z\",\"metadata\":[]}",
-			this->_measurementName, this->_measurementValue);
+			"{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}",
+			this->_measurementName, this->_measurementValue, this->getEventDate());
 }
