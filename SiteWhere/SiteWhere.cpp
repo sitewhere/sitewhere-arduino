@@ -3,6 +3,8 @@
  */
 #include "SiteWhere.h"
 #include <PubSubClient.h>
+#include <avr/pgmspace.h>
+
 
 /**
  * Create a SiteWhere instance with TCP/IP client and details about MQTT server.
@@ -29,10 +31,10 @@ boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
 		alert.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
 		if (alert.getReplyTo() != NULL) {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}"),
 					hardwareId, alert.getReplyTo(), json);
 		} else {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"alerts\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"alerts\":[%s]}"),
 					hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);
@@ -50,10 +52,10 @@ boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
 		location.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
 		if (location.getReplyTo() != NULL) {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[%s]}"),
 					hardwareId, location.getReplyTo(), json);
 		} else {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"locations\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"locations\":[%s]}"),
 					hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);
@@ -71,10 +73,10 @@ boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId,
 		measurement.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
 		if (measurement.getReplyTo() != NULL) {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[%s]}"),
 					hardwareId, measurement.getReplyTo(), json);
 		} else {
-			sprintf(message, "{\"hardwareId\":\"%s\",\"measurements\":[%s]}",
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"measurements\":[%s]}"),
 					hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);

@@ -75,8 +75,9 @@ char* DeviceAlert::getAlertMessage() {
  * Get a JSON representation of the alert.
  */
 void DeviceAlert::getJSON(char* message) {
-	sprintf(message,
-			"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}",
+	sprintf_P(message,
+			PSTR(
+					"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}"),
 			this->_alertType, this->_alertMessage, this->getEventDate());
 }
 
@@ -142,8 +143,9 @@ void DeviceLocation::getJSON(char* message) {
 	dtostrf(this->_latitude, 10, 8, strLatitude);
 	dtostrf(this->_longitude, 10, 8, strLongitude);
 	dtostrf(this->_elevation, 10, 8, strElevation);
-	sprintf(message,
-			"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}",
+	sprintf_P(message,
+			PSTR(
+					"{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}"),
 			strLatitude, strLongitude, strElevation, this->getEventDate());
 }
 
@@ -184,8 +186,8 @@ char* DeviceMeasurement::getMeasurementValue() {
  * Get a JSON representation of the measurement.
  */
 void DeviceMeasurement::getJSON(char* message) {
-	sprintf(message,
-			"{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}",
+	sprintf_P(message,
+			PSTR("{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}"),
 			this->_measurementName, this->_measurementValue,
 			this->getEventDate());
 }
