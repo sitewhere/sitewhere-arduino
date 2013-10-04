@@ -10,8 +10,8 @@
 #include <PubSubClient.h>
 #include "DeviceEvents.h"
 
-#define MAX_JSON_SIZE 250
-#define MAX_MQTT_PAYLOAD_SIZE 350
+#define MAX_JSON_SIZE 175
+#define MAX_MQTT_PAYLOAD_SIZE 225
 
 class SiteWhere {
 	public:

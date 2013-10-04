@@ -28,8 +28,13 @@ boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
 		char json[MAX_JSON_SIZE];
 		alert.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		sprintf(message, "{\"hardwareId\":\"%s\",\"alerts\":[%s]}",
-				hardwareId, json);
+		if (alert.getReplyTo() != NULL) {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}",
+					hardwareId, alert.getReplyTo(), json);
+		} else {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"alerts\":[%s]}",
+					hardwareId, json);
+		}
 		return _mqtt->publish(topic, message);
 	}
 	return false;
@@ -44,8 +49,13 @@ boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
 		char json[MAX_JSON_SIZE];
 		location.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		sprintf(message, "{\"hardwareId\":\"%s\",\"locations\":[%s]}",
-				hardwareId, json);
+		if (location.getReplyTo() != NULL) {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[%s]}",
+					hardwareId, location.getReplyTo(), json);
+		} else {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"locations\":[%s]}",
+					hardwareId, json);
+		}
 		return _mqtt->publish(topic, message);
 	}
 	return false;
@@ -60,8 +70,13 @@ boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId,
 		char json[MAX_JSON_SIZE];
 		measurement.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		sprintf(message, "{\"hardwareId\":\"%s\",\"measurements\":[%s]}",
-				hardwareId, json);
+		if (measurement.getReplyTo() != NULL) {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[%s]}",
+					hardwareId, measurement.getReplyTo(), json);
+		} else {
+			sprintf(message, "{\"hardwareId\":\"%s\",\"measurements\":[%s]}",
+					hardwareId, json);
+		}
 		return _mqtt->publish(topic, message);
 	}
 	return false;
