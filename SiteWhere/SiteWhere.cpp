@@ -5,7 +5,6 @@
 #include <PubSubClient.h>
 #include <avr/pgmspace.h>
 
-
 /**
  * Create a SiteWhere instance with TCP/IP client and details about MQTT server.
  */
@@ -24,18 +23,23 @@ boolean SiteWhere::connect(char* clientId) {
 /**
  * Send a device alert to the given topic on the MQTT broker.
  */
-boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
-		DeviceAlert& alert) {
+boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert) {
+	sendDeviceAlert(topic, hardwareId, alert, NULL);
+}
+
+/**
+ * Send a device alert to the given topic on the MQTT broker.
+ */
+boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert, char* replyTo) {
 	if (_mqtt->connected()) {
 		char json[MAX_JSON_SIZE];
 		alert.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (alert.getReplyTo() != NULL) {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}"),
-					hardwareId, alert.getReplyTo(), json);
+		if (replyTo != NULL) {
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}"), hardwareId,
+					replyTo, json);
 		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"alerts\":[%s]}"),
-					hardwareId, json);
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"alerts\":[%s]}"), hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);
 	}
@@ -45,18 +49,24 @@ boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId,
 /**
  * Send a device location to the given topic on the MQTT broker.
  */
-boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
-		DeviceLocation& location) {
+boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location) {
+	sendDeviceLocation(topic, hardwareId, location, NULL);
+}
+
+/**
+ * Send a device location to the given topic on the MQTT broker.
+ */
+boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location,
+		char* replyTo) {
 	if (_mqtt->connected()) {
 		char json[MAX_JSON_SIZE];
 		location.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (location.getReplyTo() != NULL) {
+		if (replyTo != NULL) {
 			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[%s]}"),
-					hardwareId, location.getReplyTo(), json);
+					hardwareId, replyTo, json);
 		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"locations\":[%s]}"),
-					hardwareId, json);
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"locations\":[%s]}"), hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);
 	}
@@ -66,18 +76,24 @@ boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId,
 /**
  * Send a device measurement to the given topic on the MQTT broker.
  */
-boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId,
-		DeviceMeasurement& measurement) {
+boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement) {
+	sendDeviceMeasurement(topic, hardwareId, measurement, NULL);
+}
+
+/**
+ * Send a device measurement to the given topic on the MQTT broker.
+ */
+boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement,
+		char* replyTo) {
 	if (_mqtt->connected()) {
 		char json[MAX_JSON_SIZE];
 		measurement.getJSON(json);
 		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (measurement.getReplyTo() != NULL) {
+		if (replyTo != NULL) {
 			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[%s]}"),
-					hardwareId, measurement.getReplyTo(), json);
+					hardwareId, replyTo, json);
 		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"measurements\":[%s]}"),
-					hardwareId, json);
+			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"measurements\":[%s]}"), hardwareId, json);
 		}
 		return _mqtt->publish(topic, message);
 	}
@@ -94,7 +110,6 @@ boolean SiteWhere::loop() {
 /**
  * Callback for response messages.
  */
-void SiteWhere::onResponseMessage(char* topic, byte* payload,
-		unsigned int length) {
+void SiteWhere::onResponseMessage(char* topic, byte* payload, unsigned int length) {
 }
 

@@ -13,13 +13,10 @@
 class DeviceEvent {
 public:
 	DeviceEvent(char* eventDate);
-	DeviceEvent(char* eventDate, char* replyTo);
 	char* getEventDate();
-	char* getReplyTo();
 	virtual void getJSON(char* message) = 0;
 protected:
 	char* _eventDate;
-	char* _replyTo;
 };
 
 /**
@@ -28,7 +25,6 @@ protected:
 class DeviceAlert: public DeviceEvent {
 public:
 	DeviceAlert(char* type, char* message, char* eventDate);
-	DeviceAlert(char* type, char* message, char* eventDate, char* replyTo);
 	char* getAlertType();
 	char* getAlertMessage();
 	void getJSON(char* message);
@@ -44,7 +40,6 @@ class DeviceLocation: public DeviceEvent {
 public:
 	DeviceLocation(double latitude, double longitude, char* eventDate);
 	DeviceLocation(double latitude, double longitude, double elevation, char* eventDate);
-	DeviceLocation(double latitude, double longitude, double elevation, char* eventDate, char* replyTo);
 	double getLatitude();
 	double getLongitude();
 	double getElevation();
@@ -61,7 +56,6 @@ protected:
 class DeviceMeasurement: public DeviceEvent {
 public:
 	DeviceMeasurement(char* name, char* value, char* eventDate);
-	DeviceMeasurement(char* name, char* value, char* eventDate, char* replyTo);
 	char* getMeasurementName();
 	char* getMeasurementValue();
 	void getJSON(char* message);

@@ -11,17 +11,6 @@
  */
 DeviceEvent::DeviceEvent(char* eventDate) {
 	this->_eventDate = eventDate;
-	this->_replyTo = NULL;
-}
-
-/**
- * Base constructor for device events. Event date is expected to be in the format of
- * an ISO 8601 date string (e.g. 2013-09-29T10:40Z). The 'replyTo' field can be used
- * to specify the response topic where SiteWhere will send messages to the device.
- */
-DeviceEvent::DeviceEvent(char* eventDate, char* replyTo) {
-	this->_eventDate = eventDate;
-	this->_replyTo = replyTo;
 }
 
 /**
@@ -32,27 +21,10 @@ char* DeviceEvent::getEventDate() {
 }
 
 /**
- * Get the 'reply to' information.
- */
-char* DeviceEvent::getReplyTo() {
-	return this->_replyTo;
-}
-
-/**
  * Create a device alert.
  */
 DeviceAlert::DeviceAlert(char* type, char* message, char* eventDate) :
 		DeviceEvent(eventDate) {
-	this->_alertType = type;
-	this->_alertMessage = message;
-}
-
-/**
- * Create a device alert.
- */
-DeviceAlert::DeviceAlert(char* type, char* message, char* eventDate,
-		char* replyTo) :
-		DeviceEvent(eventDate, replyTo) {
 	this->_alertType = type;
 	this->_alertMessage = message;
 }
@@ -75,17 +47,14 @@ char* DeviceAlert::getAlertMessage() {
  * Get a JSON representation of the alert.
  */
 void DeviceAlert::getJSON(char* message) {
-	sprintf_P(message,
-			PSTR(
-					"{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}"),
+	sprintf_P(message, PSTR("{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}"),
 			this->_alertType, this->_alertMessage, this->getEventDate());
 }
 
 /**
  * Create a device location based on latitude and longitude.
  */
-DeviceLocation::DeviceLocation(double latitude, double longitude,
-		char* eventDate) :
+DeviceLocation::DeviceLocation(double latitude, double longitude, char* eventDate) :
 		DeviceEvent(eventDate) {
 	this->_latitude = latitude;
 	this->_longitude = longitude;
@@ -95,20 +64,8 @@ DeviceLocation::DeviceLocation(double latitude, double longitude,
 /**
  * Create a device alert.
  */
-DeviceLocation::DeviceLocation(double latitude, double longitude,
-		double elevation, char* eventDate) :
+DeviceLocation::DeviceLocation(double latitude, double longitude, double elevation, char* eventDate) :
 		DeviceEvent(eventDate) {
-	this->_latitude = latitude;
-	this->_longitude = longitude;
-	this->_elevation = elevation;
-}
-
-/**
- * Create a device alert.
- */
-DeviceLocation::DeviceLocation(double latitude, double longitude,
-		double elevation, char* eventDate, char* replyTo) :
-		DeviceEvent(eventDate, replyTo) {
 	this->_latitude = latitude;
 	this->_longitude = longitude;
 	this->_elevation = elevation;
@@ -159,16 +116,6 @@ DeviceMeasurement::DeviceMeasurement(char* name, char* value, char* eventDate) :
 }
 
 /**
- * Create a device measurement.
- */
-DeviceMeasurement::DeviceMeasurement(char* name, char* value, char* eventDate,
-		char* replyTo) :
-		DeviceEvent(eventDate, replyTo) {
-	this->_measurementName = name;
-	this->_measurementValue = value;
-}
-
-/**
  * Get the measurement name.
  */
 char* DeviceMeasurement::getMeasurementName() {
@@ -187,7 +134,7 @@ char* DeviceMeasurement::getMeasurementValue() {
  */
 void DeviceMeasurement::getJSON(char* message) {
 	sprintf_P(message,
-			PSTR("{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}"),
-			this->_measurementName, this->_measurementValue,
-			this->getEventDate());
+			PSTR(
+					"{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}"),
+			this->_measurementName, this->_measurementValue, this->getEventDate());
 }
