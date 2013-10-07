@@ -6,18 +6,15 @@
 # Datatypes (KEYWORD1)
 #######################################
 SiteWhere	KEYWORD1
-DeviceAlert	KEYWORD1
-DeviceLocation	KEYWORD1
-DeviceMeasurement	KEYWORD1
+SiteWhereEvents	KEYWORD1
+SiteWhereAlert	KEYWORD1
+SiteWhereLocation	KEYWORD1
+SiteWhereMeasurement	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-connect	KEYWORD2
-sendDeviceAlert	KEYWORD2
-sendDeviceLocation	KEYWORD2
-sendDeviceMeasurement	KEYWORD2
-loop	KEYWORD2
+createMessage	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

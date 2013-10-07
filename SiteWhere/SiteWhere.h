@@ -8,27 +8,16 @@
 #include <Arduino.h>
 #include <Client.h>
 #include <PubSubClient.h>
-#include "DeviceEvents.h"
-
-#define MAX_JSON_SIZE 175
-#define MAX_MQTT_PAYLOAD_SIZE 225
+#include "SiteWhereEvents.h"
 
 class SiteWhere {
 public:
-	SiteWhere(Client& client, uint8_t* mqttIp, uint16_t mqttPort);
-	boolean connect(char* clientId);
-	boolean sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert);
-	boolean sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert, char* replyTo);
-	boolean sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location);
-	boolean sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location, char* replyTo);
-	boolean sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement);
-	boolean sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement,
-			char* replyTo);
-	boolean loop();
-private:
-	Client* _client;
-	PubSubClient* _mqtt;
-	static void onResponseMessage(char* topic, byte* payload, unsigned int length);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereAlert& alert);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereAlert& alert, char* replyTo);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereLocation& location);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereLocation& location, char* replyTo);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement);
+	void createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement, char* replyTo);
 };
 
 #endif

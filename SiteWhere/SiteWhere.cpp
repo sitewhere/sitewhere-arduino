@@ -2,114 +2,86 @@
  * Library for interacting with SiteWhere via MQTT.
  */
 #include "SiteWhere.h"
+#include <Stdio.h>
 #include <PubSubClient.h>
 #include <avr/pgmspace.h>
 
 /**
- * Create a SiteWhere instance with TCP/IP client and details about MQTT server.
+ * Create a JSON message for the given alert.
  */
-SiteWhere::SiteWhere(Client& client, uint8_t* mqttIp, uint16_t mqttPort) {
-	this->_client = &client;
-	this->_mqtt = new PubSubClient(mqttIp, mqttPort, onResponseMessage, client);
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereAlert& alert) {
+	return createMessage(buffer, hardwareId, alert, NULL);
 }
 
 /**
- * Connect to the MQTT server.
+ * Create a JSON message for the given alert.
  */
-boolean SiteWhere::connect(char* clientId) {
-	_mqtt->connect(clientId);
-}
-
-/**
- * Send a device alert to the given topic on the MQTT broker.
- */
-boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert) {
-	sendDeviceAlert(topic, hardwareId, alert, NULL);
-}
-
-/**
- * Send a device alert to the given topic on the MQTT broker.
- */
-boolean SiteWhere::sendDeviceAlert(char* topic, char* hardwareId, DeviceAlert& alert, char* replyTo) {
-	if (_mqtt->connected()) {
-		char json[MAX_JSON_SIZE];
-		alert.getJSON(json);
-		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (replyTo != NULL) {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[%s]}"), hardwareId,
-					replyTo, json);
-		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"alerts\":[%s]}"), hardwareId, json);
-		}
-		return _mqtt->publish(topic, message);
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereAlert& alert, char* replyTo) {
+	if (replyTo != NULL) {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, replyTo, alert.getAlertType(), alert.getAlertMessage(), alert.getEventDate());
+	} else {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"alerts\":[{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, alert.getAlertType(), alert.getAlertMessage(), alert.getEventDate());
 	}
-	return false;
 }
 
 /**
- * Send a device location to the given topic on the MQTT broker.
+ * Create a JSON message for the given location.
  */
-boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location) {
-	sendDeviceLocation(topic, hardwareId, location, NULL);
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereLocation& location) {
+	return createMessage(buffer, hardwareId, location, NULL);
 }
 
 /**
- * Send a device location to the given topic on the MQTT broker.
+ * Create a JSON message for the given location.
  */
-boolean SiteWhere::sendDeviceLocation(char* topic, char* hardwareId, DeviceLocation& location,
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereLocation& location, char* replyTo) {
+	char strLatitude[16], strLongitude[16], strElevation[16];
+	dtostrf(location.getLatitude(), 10, 8, strLatitude);
+	dtostrf(location.getLongitude(), 10, 8, strLongitude);
+	dtostrf(location.getElevation(), 10, 8, strElevation);
+
+	if (replyTo != NULL) {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, replyTo, strLatitude, strLongitude, strElevation, location.getEventDate());
+	} else {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"locations\":[{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, strLatitude, strLongitude, strElevation, location.getEventDate());
+	}
+}
+
+/**
+ * Create a JSON message for the given measurement.
+ */
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement) {
+	return createMessage(buffer, hardwareId, measurement, NULL);
+}
+
+/**
+ * Create a JSON message for the given measurement.
+ */
+void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement,
 		char* replyTo) {
-	if (_mqtt->connected()) {
-		char json[MAX_JSON_SIZE];
-		location.getJSON(json);
-		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (replyTo != NULL) {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[%s]}"),
-					hardwareId, replyTo, json);
-		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"locations\":[%s]}"), hardwareId, json);
-		}
-		return _mqtt->publish(topic, message);
+	if (replyTo != NULL) {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, replyTo, measurement.getMeasurementName(), measurement.getMeasurementValue(),
+				measurement.getEventDate());
+	} else {
+		sprintf_P(buffer,
+				PSTR(
+						"{\"hardwareId\":\"%s\",\"measurements\":[{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}]}"),
+				hardwareId, measurement.getMeasurementName(), measurement.getMeasurementValue(),
+				measurement.getEventDate());
 	}
-	return false;
 }
-
-/**
- * Send a device measurement to the given topic on the MQTT broker.
- */
-boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement) {
-	sendDeviceMeasurement(topic, hardwareId, measurement, NULL);
-}
-
-/**
- * Send a device measurement to the given topic on the MQTT broker.
- */
-boolean SiteWhere::sendDeviceMeasurement(char* topic, char* hardwareId, DeviceMeasurement& measurement,
-		char* replyTo) {
-	if (_mqtt->connected()) {
-		char json[MAX_JSON_SIZE];
-		measurement.getJSON(json);
-		char message[MAX_MQTT_PAYLOAD_SIZE];
-		if (replyTo != NULL) {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[%s]}"),
-					hardwareId, replyTo, json);
-		} else {
-			sprintf_P(message, PSTR("{\"hardwareId\":\"%s\",\"measurements\":[%s]}"), hardwareId, json);
-		}
-		return _mqtt->publish(topic, message);
-	}
-	return false;
-}
-
-/**
- * Handle processing loop for receiving messages on the socket.
- */
-boolean SiteWhere::loop() {
-	_mqtt->loop();
-}
-
-/**
- * Callback for response messages.
- */
-void SiteWhere::onResponseMessage(char* topic, byte* payload, unsigned int length) {
-}
-
