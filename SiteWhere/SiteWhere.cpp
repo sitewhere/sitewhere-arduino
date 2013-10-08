@@ -17,17 +17,14 @@ void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereAlert& al
  * Create a JSON message for the given alert.
  */
 void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereAlert& alert, char* replyTo) {
-	if (replyTo != NULL) {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"alerts\":[{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, replyTo, alert.getAlertType(), alert.getAlertMessage(), alert.getEventDate());
-	} else {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"alerts\":[{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, alert.getAlertType(), alert.getAlertMessage(), alert.getEventDate());
-	}
+	char* replyToW = jsonify(replyTo);
+	char* eventDateW = jsonify(alert.getEventDate());
+	sprintf_P(buffer,
+			PSTR(
+					"{\"hardwareId\":\"%s\",\"replyTo\":%s,\"alerts\":[{\"type\":\"%s\",\"message\":\"%s\",\"eventDate\":%s,\"metadata\":[]}]}"),
+			hardwareId, replyToW, alert.getAlertType(), alert.getAlertMessage(), eventDateW);
+	free(replyToW);
+	free(eventDateW);
 }
 
 /**
@@ -45,18 +42,15 @@ void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereLocation&
 	dtostrf(location.getLatitude(), 10, 8, strLatitude);
 	dtostrf(location.getLongitude(), 10, 8, strLongitude);
 	dtostrf(location.getElevation(), 10, 8, strElevation);
+	char* replyToW = jsonify(replyTo);
+	char* eventDateW = jsonify(location.getEventDate());
 
-	if (replyTo != NULL) {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"locations\":[{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, replyTo, strLatitude, strLongitude, strElevation, location.getEventDate());
-	} else {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"locations\":[{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, strLatitude, strLongitude, strElevation, location.getEventDate());
-	}
+	sprintf_P(buffer,
+			PSTR(
+					"{\"hardwareId\":\"%s\",\"replyTo\":%s,\"locations\":[{\"latitude\":\"%s\",\"longitude\":\"%s\",\"elevation\":\"%s\",\"eventDate\":%s,\"metadata\":[]}]}"),
+			hardwareId, replyToW, strLatitude, strLongitude, strElevation, eventDateW);
+	free(replyToW);
+	free(eventDateW);
 }
 
 /**
@@ -71,17 +65,31 @@ void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereMeasureme
  */
 void SiteWhere::createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement,
 		char* replyTo) {
-	if (replyTo != NULL) {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"replyTo\":\"%s\",\"measurements\":[{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, replyTo, measurement.getMeasurementName(), measurement.getMeasurementValue(),
-				measurement.getEventDate());
-	} else {
-		sprintf_P(buffer,
-				PSTR(
-						"{\"hardwareId\":\"%s\",\"measurements\":[{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":\"%s\",\"metadata\":[]}]}"),
-				hardwareId, measurement.getMeasurementName(), measurement.getMeasurementValue(),
-				measurement.getEventDate());
+	char* replyToW = jsonify(replyTo);
+	char* eventDateW = jsonify(measurement.getEventDate());
+
+	sprintf_P(buffer,
+			PSTR(
+					"{\"hardwareId\":\"%s\",\"replyTo\":%s,\"measurements\":[{\"measurements\":[{\"name\":\"%s\",\"value\":\"%s\"}],\"eventDate\":%s,\"metadata\":[]}]}"),
+			hardwareId, replyToW, measurement.getMeasurementName(), measurement.getMeasurementValue(),
+			eventDateW);
+	free(replyToW);
+	free(eventDateW);
+}
+
+/** Creates a new field that either holds 'null' or a quote-wrapped version of the string */
+char* SiteWhere::jsonify(char* field) {
+	if (field == NULL) {
+		char* nullResponse = (char*) malloc(5);
+		memcpy(nullResponse, "null", 4);
+		nullResponse[4] = NULL;
+		return nullResponse;
 	}
+	int length = strlen(field);
+	char* quoted = (char*) malloc(length + 3);
+	quoted[0] = '\"';
+	memcpy(quoted + 1, field, length);
+	quoted[length + 1] = '\"';
+	quoted[length + 2] = NULL;
+	return quoted;
 }

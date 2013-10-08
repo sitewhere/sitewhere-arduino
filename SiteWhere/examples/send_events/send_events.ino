@@ -31,7 +31,7 @@ int delta = 5;
 int currentHeartRate = MIN_HEART_RATE;
 
 /** Buffer for JSON message */
-char messageBuffer[250];
+char messageBuffer[225];
 
 /** Callback function header */
 void callback(char* topic, byte* payload, unsigned int length);
@@ -40,8 +40,9 @@ EthernetClient ethClient;
 PubSubClient mqttClient(mqtt, 1883, callback, ethClient);
 SiteWhere sitewhere;
 
-SiteWhereMeasurement measurement("heart.rate", "100", "2013-10-03T15:15:12Z");
+SiteWhereMeasurement measurement("heart.rate", "100", NULL);
 SiteWhereAlert alert("nurse.call", "Nurse call button pressed!", "2013-10-03T15:15:12Z");
+SiteWhereLocation location(34.12142594794674, -84.20103406853741, 0, NULL);
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);      
@@ -51,9 +52,9 @@ void setup() {
   Ethernet.begin(mac, ip);
   if (mqttClient.connect("arduinoClient")) {
     Serial.println(F("Connected to MQTT."));
-    if (!mqttClient.subscribe("SiteWhere/response")) {
-      Serial.println(F("Failed on subscribe to response topic."));
-    }
+    mqttClient.subscribe("SiteWhere/response");
+    sitewhere.createMessage(messageBuffer, "2394738380-MEI-001", location, "SiteWhere/response");
+    mqttClient.publish("SiteWhere/input", messageBuffer);
   } else {
     Serial.println(F("Unable to connect to SiteWhere via MQTT."));
   }
@@ -72,9 +73,6 @@ void loop() {
     lastAlertTime = millis();
     sitewhere.createMessage(messageBuffer, "2394738380-MEI-001", alert, "SiteWhere/response");
     mqttClient.publish("SiteWhere/input", messageBuffer);
-    digitalWrite(LED_PIN, HIGH);
-  } else {
-    digitalWrite(LED_PIN, LOW); 
   }
 
   mqttClient.loop();
@@ -85,6 +83,13 @@ void handleResponse(char* topic, char* payload) {
   Serial.print(topic);
   Serial.print(": ");
   Serial.println(payload);
+  if (strcmp(topic, "SiteWhere/response") == 0) {
+    if (strcmp(payload, "A:FLASH") == 0) {
+      digitalWrite(LED_PIN, HIGH);
+      delay(1000);
+      digitalWrite(LED_PIN, LOW); 
+    }
+  }
 }
 
 /** Called when a response comes in from a subscribed topic */

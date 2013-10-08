@@ -18,6 +18,8 @@ public:
 	void createMessage(char* buffer, char* hardwareId, SiteWhereLocation& location, char* replyTo);
 	void createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement);
 	void createMessage(char* buffer, char* hardwareId, SiteWhereMeasurement& measurement, char* replyTo);
+private:
+	char* jsonify(char* field);
 };
 
 #endif
