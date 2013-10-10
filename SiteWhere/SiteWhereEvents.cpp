@@ -141,8 +141,22 @@ char* SiteWhereMeasurement::getMeasurementName() {
 }
 
 /**
+ * Set the measurement name.
+ */
+void SiteWhereMeasurement::setMeasurementName(char* name) {
+	this->_measurementName = name;
+}
+
+/**
  * Get the measurement value.
  */
 char* SiteWhereMeasurement::getMeasurementValue() {
 	return this->_measurementValue;
+}
+
+/**
+ * Set the measurement value.
+ */
+void SiteWhereMeasurement::setMeasurementValue(char* value) {
+	this->_measurementValue = value;
 }
