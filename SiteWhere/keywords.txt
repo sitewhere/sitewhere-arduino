@@ -5,16 +5,12 @@
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
-SiteWhere	KEYWORD1
-SiteWhereEvents	KEYWORD1
-SiteWhereAlert	KEYWORD1
-SiteWhereLocation	KEYWORD1
-SiteWhereMeasurement	KEYWORD1
+sitewhere	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-createMessage	KEYWORD2
+sw_register	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
