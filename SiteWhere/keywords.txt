@@ -11,6 +11,7 @@ sitewhere	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 sw_register	KEYWORD2
+sw_acknowledge	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
