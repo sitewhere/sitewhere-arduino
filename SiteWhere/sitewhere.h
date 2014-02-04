@@ -17,7 +17,12 @@ extern "C" {
 /**
  * Create a binary message that can be sent to a SiteWhere server to register a device.
  */
-boolean sw_register(char* hardwareId, char* specificationToken, char* replyTo, uint8_t* buffer, size_t length);
+boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length);
+
+/**
+ * Create a binary message that can be sent to a SiteWhere server to acknowledge a command.
+ */
+boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length);
 
 #ifdef __cplusplus
 } /* extern "C" */
