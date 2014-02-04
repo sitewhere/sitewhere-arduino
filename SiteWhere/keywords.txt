@@ -12,6 +12,7 @@ sitewhere	KEYWORD1
 #######################################
 sw_register	KEYWORD2
 sw_acknowledge	KEYWORD2
+sw_location	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

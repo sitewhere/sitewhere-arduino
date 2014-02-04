@@ -17,12 +17,19 @@ extern "C" {
 /**
  * Create a binary message that can be sent to a SiteWhere server to register a device.
  */
-boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length);
+boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length,
+		char* originator);
 
 /**
  * Create a binary message that can be sent to a SiteWhere server to acknowledge a command.
  */
-boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length);
+boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length, char* originator);
+
+/**
+ * Report device location.
+ */
+boolean sw_location(char* hardwareId, float lat, float lon, float elevation, int64_t eventDate,
+		uint8_t* buffer, size_t length, char* originator);
 
 #ifdef __cplusplus
 } /* extern "C" */
