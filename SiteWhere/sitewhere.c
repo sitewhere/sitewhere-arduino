@@ -31,7 +31,7 @@ boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer,
 	return pb_write(&stream, &zero, 1);
 }
 
-boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length, char* originator) {
+boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	// Send header.
@@ -48,6 +48,10 @@ boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length, char* o
 	// Send messsage.
 	SiteWhere_Acknowledge ack = { };
 	strcpy(ack.hardwareId, hardwareId);
+	if (message != NULL) {
+		ack.has_message = true;
+		strcpy(ack.message, message);
+	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Acknowledge_fields, &ack)) {
 		return false;
 	}
@@ -76,7 +80,10 @@ boolean sw_location(char* hardwareId, float lat, float lon, float elevation, int
 	location.latitude = lat;
 	location.longitude = lon;
 	location.elevation = elevation;
-	location.eventDate = eventDate;
+	if (eventDate != NULL) {
+		location.has_eventDate = true;
+		location.eventDate = eventDate;
+	}
 	if (!pb_encode_delimited(&stream, SiteWhere_DeviceLocation_fields, &location)) {
 		return false;
 	}

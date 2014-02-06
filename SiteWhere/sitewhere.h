@@ -23,7 +23,7 @@ boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer,
 /**
  * Create a binary message that can be sent to a SiteWhere server to acknowledge a command.
  */
-boolean sw_acknowledge(char* hardwareId, uint8_t* buffer, size_t length, char* originator);
+boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator);
 
 /**
  * Report device location.
