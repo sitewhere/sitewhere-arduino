@@ -26,9 +26,21 @@ boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer,
 boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator);
 
 /**
+ * Report a single measurement.
+ */
+boolean sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
+		uint8_t* buffer, size_t length, char* originator);
+
+/**
  * Report device location.
  */
 boolean sw_location(char* hardwareId, float lat, float lon, float elevation, int64_t eventDate,
+		uint8_t* buffer, size_t length, char* originator);
+
+/**
+ * Report a device alert condition.
+ */
+boolean sw_alert(char* hardwareId, char* type, char* message, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator);
 
 #ifdef __cplusplus
