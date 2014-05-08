@@ -14,33 +14,23 @@
 extern "C" {
 #endif
 
-/**
- * Create a binary message that can be sent to a SiteWhere server to register a device.
- */
-boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length,
+/** Create an encoded registration message for sending to SiteWhere */
+unsigned int sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length,
 		char* originator);
 
-/**
- * Create a binary message that can be sent to a SiteWhere server to acknowledge a command.
- */
-boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator);
+/** Create an encoded acknowledgement message for sending to SiteWhere */
+unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator);
 
-/**
- * Report a single measurement.
- */
-boolean sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
+/** Create an encoded measurement message for sending to SiteWhere */
+unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator);
 
-/**
- * Report device location.
- */
-boolean sw_location(char* hardwareId, float lat, float lon, float elevation, int64_t eventDate,
+/** Create an encoded location message for sending to SiteWhere */
+unsigned int sw_location(char* hardwareId, float lat, float lon, float elevation, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator);
 
-/**
- * Report a device alert condition.
- */
-boolean sw_alert(char* hardwareId, char* type, char* message, int64_t eventDate,
+/** Create an encoded alert message for sending to SiteWhere */
+unsigned int sw_alert(char* hardwareId, char* type, char* message, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator);
 
 #ifdef __cplusplus

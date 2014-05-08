@@ -2,7 +2,7 @@
 #include <pb_decode.h>
 #include <pb_encode.h>
 #include <sitewhere.h>
-#include <sitewhere.pb.h>
+#include <sitewhere-arduino.pb.h>
 
 #include "uno.h"
 
@@ -12,7 +12,7 @@
 
 // Update these with values suitable for your network.
 byte mac[]  = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte mqtt[] = { 54, 80, 46, 154 };
+byte mqtt[] = { 192, 168, 1, 68 };
 
 /** Callback function header */
 void callback(char* topic, byte* payload, unsigned int length);
@@ -22,13 +22,22 @@ EthernetClient ethClient;
 PubSubClient mqttClient(mqtt, 1883, callback, ethClient);
 
 /** Message buffer */
-uint8_t buffer[128];
+uint8_t buffer[300];
 
-static char* hardwareId = "90970e47-cfc5-40e6-ad1f-68a9146de179";
-static char* specificationToken = "7dfd6d63-5e8d-4380-be04-fc5c73801dfb";
+/** Unqiue hardware id for this device */
+static char* hardwareId = "123-TEST-234567";
+
+/** Device specification token for hardware configuration */
+static char* specificationToken = "82043707-9e3d-441f-bdcc-33cf0f4f7260";
+
+/** Outbound MQTT topic */
 static char* outbound = "SiteWhere/input/protobuf";
-static char* command = "SiteWhere/commands/90970e47-cfc5-40e6-ad1f-68a9146de179";
-static char* system = "SiteWhere/system/90970e47-cfc5-40e6-ad1f-68a9146de179";
+
+/** Inbound custom command topic */
+static char* command = "SiteWhere/commands/123-TEST-234567";
+
+/** Inbound system command topic */
+static char* system = "SiteWhere/system/123-TEST-234567";
 
 /** Handle MQTT subscription responses */
 void callback(char* topic, byte* payload, unsigned int length) {

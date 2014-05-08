@@ -1,6 +1,9 @@
 option optimize_for = LITE_RUNTIME;
 
-// Encapsulates data sent to SiteWhere.
+// Arduino proto that specifies how data is sent to/from SiteWhere.
+//
+// NOTE: This proto has been converted to use fixed64 rather than float for doubles
+//       since arduino does not support a real double datatype.
 message SiteWhere {
 
 	enum Command {REGISTER = 1; ACKNOWLEDGE = 2; DEVICELOCATION = 3; DEVICEALERT = 4; DEVICEMEASUREMENT = 5; } 
@@ -26,10 +29,10 @@ message SiteWhere {
 	// Report device location.
 	message DeviceLocation {
 		required string hardwareId = 1;
-		required string latitude = 2;
-		required string longitude = 3;
-		required string elevation = 4;
-		optional int64 eventDate = 5;
+		required fixed64 latitude = 2;
+		required fixed64 longitude = 3;
+		optional fixed64 elevation = 4;
+		optional fixed64 eventDate = 5;
 	}
 
 	// Report device alert.
@@ -37,15 +40,20 @@ message SiteWhere {
 		required string hardwareId = 1;
 		required string alertType = 2;
 		required string alertMessage = 3;
-		optional int64 eventDate = 4;
+		optional fixed64 eventDate = 4;
+	}
+	
+	// A single measurement.
+	message Measurement {
+		required string measurementId = 2;
+		required fixed64 measurementValue = 3;
 	}
 
-	// Report device measurement.
-	message DeviceMeasurement {
+	// Event message for device measurements.
+	message DeviceMeasurements {
 		required string hardwareId = 1;
-		required string measurementId = 2;
-		required string measurementValue = 3;
-		optional int64 eventDate = 4;
+		repeated Measurement measurement = 2;
+		optional fixed64 eventDate = 3;
 	}
 }
 

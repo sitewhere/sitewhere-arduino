@@ -1,6 +1,7 @@
 #include "sitewhere.h"
-#include "sitewhere.pb.h"
+#include "sitewhere-arduino.pb.h"
 #include "pb_encode.h"
+#include "double_conversion.h"
 
 // Signals end of stream.
 uint8_t zero = 0;
@@ -8,10 +9,7 @@ uint8_t zero = 0;
 // Shared header.
 SiteWhere_Header header = { };
 
-// Buffer for converting floats to strings.
-char fstr[16];
-
-boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length, char* originator) {
+unsigned int sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	header.command = SiteWhere_Command_REGISTER;
@@ -20,20 +18,20 @@ boolean sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer,
 		strcpy(header.originator, originator);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Header_fields, &header)) {
-		return false;
+		return 0;
 	}
 
 	SiteWhere_RegisterDevice registerDevice = { };
 	strcpy(registerDevice.hardwareId, hardwareId);
 	strcpy(registerDevice.specificationToken, specificationToken);
 	if (!pb_encode_delimited(&stream, SiteWhere_RegisterDevice_fields, &registerDevice)) {
-		return false;
+		return 0;
 	}
 
-	return pb_write(&stream, &zero, 1);
+	return stream.bytes_written;
 }
 
-boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator) {
+unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	header.command = SiteWhere_Command_ACKNOWLEDGE;
@@ -42,7 +40,7 @@ boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t 
 		strcpy(header.originator, originator);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Header_fields, &header)) {
-		return false;
+		return 0;
 	}
 
 	SiteWhere_Acknowledge ack = { };
@@ -52,13 +50,13 @@ boolean sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t 
 		strcpy(ack.message, message);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Acknowledge_fields, &ack)) {
-		return false;
+		return 0;
 	}
 
-	return pb_write(&stream, &zero, 1);
+	return stream.bytes_written;
 }
 
-boolean sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
+unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
@@ -68,28 +66,30 @@ boolean sw_measurement(char* hardwareId, char* name, float value, int64_t eventD
 		strcpy(header.originator, originator);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Header_fields, &header)) {
-		return false;
+		return 0;
 	}
 
-	SiteWhere_DeviceMeasurement measurement = { };
-	strcpy(measurement.hardwareId, hardwareId);
-	strcpy(measurement.measurementId, name);
+	SiteWhere_DeviceMeasurements measurements = { };
+	strcpy(measurements.hardwareId, hardwareId);
 
-	dtostrf(value, 10, 8, fstr);
-	strcpy(measurement.measurementValue, fstr);
+	SiteWhere_Measurement measurement = { };
+	strcpy(measurement.measurementId, name);
+	measurement.measurementValue = float_to_double(value);
+	measurements.measurement[0] = measurement;
+	measurements.measurement_count = 1;
 
 	if (eventDate != NULL) {
-		measurement.has_eventDate = true;
-		measurement.eventDate = eventDate;
+		measurements.has_eventDate = true;
+		measurements.eventDate = eventDate;
 	}
-	if (!pb_encode_delimited(&stream, SiteWhere_DeviceMeasurement_fields, &measurement)) {
-		return false;
+	if (!pb_encode_delimited(&stream, SiteWhere_DeviceMeasurements_fields, &measurements)) {
+		return 0;
 	}
 
-	return pb_write(&stream, &zero, 1);
+	return stream.bytes_written;
 }
 
-boolean sw_location(char* hardwareId, float lat, float lon, float ele, int64_t eventDate,
+unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
@@ -99,29 +99,28 @@ boolean sw_location(char* hardwareId, float lat, float lon, float ele, int64_t e
 		strcpy(header.originator, originator);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Header_fields, &header)) {
-		return false;
+		return 0;
 	}
 
 	SiteWhere_DeviceLocation location = { };
 	strcpy(location.hardwareId, hardwareId);
-	dtostrf(lat, 10, 8, fstr);
-	strcpy(location.latitude, fstr);
-	dtostrf(lon, 10, 8, fstr);
-	strcpy(location.longitude, fstr);
-	dtostrf(ele, 10, 8, fstr);
-	strcpy(location.elevation, fstr);
+	location.latitude = float_to_double(lat);
+	location.longitude = float_to_double(lon);
+	location.elevation = float_to_double(ele);
+	location.has_elevation = true;
+
 	if (eventDate != NULL) {
 		location.has_eventDate = true;
 		location.eventDate = eventDate;
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_DeviceLocation_fields, &location)) {
-		return false;
+		return 0;
 	}
 
-	return pb_write(&stream, &zero, 1);
+	return stream.bytes_written;
 }
 
-boolean sw_alert(char* hardwareId, char* alertType, char* alertMessage, int64_t eventDate,
+unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int64_t eventDate,
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
@@ -131,7 +130,7 @@ boolean sw_alert(char* hardwareId, char* alertType, char* alertMessage, int64_t 
 		strcpy(header.originator, originator);
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_Header_fields, &header)) {
-		return false;
+		return 0;
 	}
 
 	SiteWhere_DeviceAlert alert = { };
@@ -143,8 +142,8 @@ boolean sw_alert(char* hardwareId, char* alertType, char* alertMessage, int64_t 
 		alert.eventDate = eventDate;
 	}
 	if (!pb_encode_delimited(&stream, SiteWhere_DeviceAlert_fields, &alert)) {
-		return false;
+		return 0;
 	}
 
-	return pb_write(&stream, &zero, 1);
+	return stream.bytes_written;
 }
