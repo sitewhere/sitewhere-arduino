@@ -26,26 +26,26 @@ uint8_t buffer[300];
 static char* clientName = "arduinoClient";
 
 /** Unique hardware id for this device */
-static char* hardwareId = "123-TEST-234567";
+static char* hardwareId = "123-GATEWAY-234567";
 
 /** Device specification token for hardware configuration */
-static char* specificationToken = "82043707-9e3d-441f-bdcc-33cf0f4f7260";
+static char* specificationToken = "75126a52-0607-4cca-b995-df40e73a707b";
 
 /** Outbound MQTT topic */
 static char* outbound = "SiteWhere/input/protobuf";
 
 /** Inbound custom command topic */
-static char* command = "SiteWhere/command/123-TEST-234567";
+static char* command = "SiteWhere/command/123-GATEWAY-234567";
 
 /** Inbound system command topic */
-static char* system = "SiteWhere/system/123-TEST-234567";
+static char* system = "SiteWhere/system/123-GATEWAY-234567";
 
 /** Handle MQTT subscription responses */
 void callback(char* topic, byte* payload, unsigned int length) {
   if (strcmp(topic, system) == 0) {
     handleSystemCommand(payload, length);
   } else if (strcmp(topic, command) == 0) {
-    // No custom commands in this example.
+    handleSpecificationCommand(payload, length);
   }
 }
 
@@ -75,21 +75,29 @@ static void handleSystemCommand(byte* payload, unsigned int length) {
   }
 }
 
-/** Test each event type */
-static void testEvents() {
-  unsigned int len = 0;
-  if (len = sw_acknowledge(hardwareId, "Ack from Arduino", buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
+/** Handle a command specific to the specification for this device */
+static void handleSpecificationCommand(byte* payload, unsigned int length) {
+  Device_Header header;
+  pb_istream_t stream = pb_istream_from_buffer(payload, length);
+	
+  // Use the generic device header since it is API compatible with all command headers.
+  if (pb_decode_delimited(&stream, Device_Header_fields, &header)) {
+    
+    Serial.println("Decoded header for specification command.");
+    if (header.has_nestedPath && header.has_nestedSpec) {
+      handleNestedCommand(header.nestedPath, header.nestedSpec, &header);
+    } else {
+      Serial.println(F("Command did not address a nested device."));
+    }
   }
-  if (len = sw_location(hardwareId, 33.755f, -84.39f, 0.1f, NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
-  if (len = sw_measurement(hardwareId, "engine.temp", 25.1f, NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
-  if (len = sw_alert(hardwareId, "engine.overheat", "The engine is overheating!", NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
+}
+
+/** Execute a nested command based on relative path, device specification, and header */
+static void handleNestedCommand(char* path, char* specification, void* header) {
+  Serial.print(F("Relative path for nested device: "));
+  Serial.println(path);
+  Serial.print(F("Specification for nested device: "));
+  Serial.println(specification);
 }
 
 /** Set up processing */

@@ -36,6 +36,8 @@ SiteWhere.DeviceMeasurements.measurement			max_count:5
 
 # Max lengths for header.
 Device.Header.originator 							max_size:30
+Device.Header.nestedPath 							max_size:50
+Device.Header.nestedSpec 							max_size:40
 
 # Max lengths for registrationAck().
 Device.RegistrationAck.errorMessage 				max_size:70
