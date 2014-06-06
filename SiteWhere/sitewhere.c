@@ -6,12 +6,10 @@
 // Signals end of stream.
 uint8_t zero = 0;
 
-// Shared header.
-SiteWhere_Header header = { };
-
 unsigned int sw_register(char* hardwareId, char* specificationToken, uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
+	SiteWhere_Header header = { };
 	header.command = SiteWhere_Command_REGISTER;
 	if (originator != NULL) {
 		header.has_originator = true;
@@ -34,6 +32,7 @@ unsigned int sw_register(char* hardwareId, char* specificationToken, uint8_t* bu
 unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
+	SiteWhere_Header header = { };
 	header.command = SiteWhere_Command_ACKNOWLEDGE;
 	if (originator != NULL) {
 		header.has_originator = true;
@@ -60,6 +59,7 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
+	SiteWhere_Header header = { };
 	header.command = SiteWhere_Command_DEVICEMEASUREMENT;
 	if (originator != NULL) {
 		header.has_originator = true;
@@ -93,6 +93,7 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
+	SiteWhere_Header header = { };
 	header.command = SiteWhere_Command_DEVICELOCATION;
 	if (originator != NULL) {
 		header.has_originator = true;
@@ -124,6 +125,7 @@ unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int
 		uint8_t* buffer, size_t length, char* originator) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
+	SiteWhere_Header header = { };
 	header.command = SiteWhere_Command_DEVICEALERT;
 	if (originator != NULL) {
 		header.has_originator = true;
