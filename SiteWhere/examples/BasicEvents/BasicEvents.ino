@@ -22,23 +22,29 @@ PubSubClient mqttClient(mqtt, 1883, callback, ethClient);
 /** Message buffer */
 uint8_t buffer[300];
 
+/** Keeps up with whether we have registered */
+bool registered = false;
+
+/** Timestamp for last event */
+unsigned long lastEvent = millis();
+
 /** MQTT client name */
 static char* clientName = "arduinoClient";
 
 /** Unique hardware id for this device */
-static char* hardwareId = "123-TEST-234567";
+static char* hardwareId = "123-ARDUINO-TEST";
 
 /** Device specification token for hardware configuration */
-static char* specificationToken = "82043707-9e3d-441f-bdcc-33cf0f4f7260";
+static char* specificationToken = "417b36a8-21ef-4196-a8fe-cc756f994d0b";
 
 /** Outbound MQTT topic */
 static char* outbound = "SiteWhere/input/protobuf";
 
 /** Inbound custom command topic */
-static char* command = "SiteWhere/command/123-TEST-234567";
+static char* command = "SiteWhere/commands/123-ARDUINO-TEST";
 
 /** Inbound system command topic */
-static char* system = "SiteWhere/system/123-TEST-234567";
+static char* system = "SiteWhere/system/123-ARDUINO-TEST";
 
 /** Handle MQTT subscription responses */
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -63,8 +69,10 @@ static void handleSystemCommand(byte* payload, unsigned int length) {
       if (pb_decode_delimited(&stream, Device_RegistrationAck_fields, &ack)) {
         if (ack.state == Device_RegistrationAckState_NEW_REGISTRATION) {
           Serial.println(F("Registered new device."));
+          registered = true;
         } else if (ack.state == Device_RegistrationAckState_ALREADY_REGISTERED) {
           Serial.println(F("Device was already registered."));
+          registered = true;
         } else if (ack.state == Device_RegistrationAckState_REGISTRATION_ERROR) {
           Serial.println(F("Error registering device."));
         }
@@ -72,23 +80,6 @@ static void handleSystemCommand(byte* payload, unsigned int length) {
     }
   } else {
     Serial.println(F("Unable to decode system command."));
-  }
-}
-
-/** Test each event type */
-static void testEvents() {
-  unsigned int len = 0;
-  if (len = sw_acknowledge(hardwareId, "Ack from Arduino", buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
-  if (len = sw_location(hardwareId, 33.755f, -84.39f, 0.1f, NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
-  if (len = sw_measurement(hardwareId, "engine.temp", 25.1f, NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
-  }
-  if (len = sw_alert(hardwareId, "engine.overheat", "The engine is overheating!", NULL, buffer, sizeof(buffer), NULL)) {
-    mqttClient.publish(outbound, buffer, len);
   }
 }
 
@@ -121,4 +112,14 @@ void setup() {
 /** Main MQTT processing loop */
 void loop() {
   mqttClient.loop();
+  
+  /** Only send events after registered and at most every five seconds */
+  if ((registered) && ((millis() - lastEvent) > 5000)) {
+    unsigned int len = 0;
+    if (len = sw_alert(hardwareId, "arduino.alive", "The Arduino is alive!", NULL, buffer, sizeof(buffer), NULL)) {
+      mqttClient.publish(outbound, buffer, len);
+      Serial.println(F("Sent alert."));
+    }
+    lastEvent = millis();
+  }
 }
