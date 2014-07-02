@@ -1,4 +1,0 @@
-# This file defines the nanopb-specific options for Uno proto.
-
-Uno._Header.originator			max_size:30
-Uno.serialPrintln.message		max_size:70

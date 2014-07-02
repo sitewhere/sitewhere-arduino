@@ -1,0 +1,4 @@
+# This file defines the nanopb-specific options for custom.proto.
+
+ArduinoCustom._Header.originator		max_size:30
+ArduinoCustom.serialPrintln.message		max_size:100

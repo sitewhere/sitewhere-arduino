@@ -1,0 +1,24 @@
+option optimize_for = LITE_RUNTIME;
+
+// Google Protocol Buffer for 'Arduino Mega Default'.
+message ArduinoCustom {
+
+	enum Command {PING = 1; TESTEVENTS = 2; SERIALPRINTLN = 3; }
+
+	message _Header {
+		required Command command = 1;
+		optional string originator = 2;
+		optional string nestedPath = 3;
+		optional string nestedSpec = 4;
+	}
+
+	message ping {
+	}
+
+	message testEvents {
+	}
+
+	message serialPrintln {
+		required string message = 1;
+	}
+}
