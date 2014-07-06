@@ -88,7 +88,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println(F("Starting up ethernet..."));
   if (Ethernet.begin(mac) == 0) {
-    Serial.println(F("Unable to get initialize ethernet."));
+    Serial.println(F("Unable to get ethernet address."));
     return;
   }
   Serial.println(F("Connected to ethernet."));
@@ -100,8 +100,9 @@ void setup() {
     mqttClient.subscribe(system);
 
     // Register device with SiteWhere.
-    if (sw_register(hardwareId, specificationToken, buffer, sizeof(buffer), NULL)) {
-      mqttClient.publish(outbound, (char*) buffer);
+    unsigned int len = 0;
+    if (len = sw_register(hardwareId, specificationToken, buffer, sizeof(buffer), NULL)) {
+      mqttClient.publish(outbound, buffer, len);
     }
     Serial.println("Sent registration.");
   } else {
