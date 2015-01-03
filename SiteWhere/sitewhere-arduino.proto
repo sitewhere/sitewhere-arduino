@@ -45,8 +45,8 @@ message SiteWhere {
 	
 	// A single measurement.
 	message Measurement {
-		required string measurementId = 2;
-		required fixed64 measurementValue = 3;
+		required string measurementId = 1;
+		required fixed64 measurementValue = 2;
 	}
 
 	// Event message for device measurements.

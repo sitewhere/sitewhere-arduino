@@ -45,8 +45,8 @@ const pb_field_t SiteWhere_DeviceAlert_fields[5] = {
 };
 
 const pb_field_t SiteWhere_Measurement_fields[3] = {
-    PB_FIELD2(  2, STRING  , REQUIRED, STATIC  , FIRST, SiteWhere_Measurement, measurementId, measurementId, 0),
-    PB_FIELD2(  3, FIXED64 , REQUIRED, STATIC  , OTHER, SiteWhere_Measurement, measurementValue, measurementId, 0),
+    PB_FIELD2(  1, STRING  , REQUIRED, STATIC  , FIRST, SiteWhere_Measurement, measurementId, measurementId, 0),
+    PB_FIELD2(  2, FIXED64 , REQUIRED, STATIC  , OTHER, SiteWhere_Measurement, measurementValue, measurementId, 0),
     PB_LAST_FIELD
 };
 
