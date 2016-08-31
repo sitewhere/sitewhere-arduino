@@ -119,7 +119,7 @@ void loop() {
   /** Only send events after registered and at most every five seconds */
   if ((registered) && ((millis() - lastEvent) > 5000)) {
     unsigned int len = 0;
-    if (len = sw_alert(hardwareId, "arduino.alive", buffer, sizeof(buffer), NULL)) {
+    if (len = sw_alert(hardwareId, "arduino.alive", "The Arduino is alive!", NULL, buffer, sizeof(buffer), NULL)) {
       mqttClient.publish(outbound, buffer, len);
       Serial.println(F("Sent alert."));
     }
