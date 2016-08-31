@@ -1,8 +1,10 @@
+#include <double_conversion.h>
 #include <pb.h>
+#include <pb_common.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <sitewhere.h>
 #include <sitewhere-arduino.pb.h>
+#include <sitewhere.h>
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -41,16 +43,16 @@ static char* specificationToken = "417b36a8-21ef-4196-a8fe-cc756f994d0b";
 static char* outbound = "SiteWhere/input/protobuf";
 
 /** Inbound custom command topic */
-static char* command = "SiteWhere/commands/123-ARDUINO-TEST";
+static char* cmdtopic = "SiteWhere/commands/123-ARDUINO-TEST";
 
 /** Inbound system command topic */
-static char* system = "SiteWhere/system/123-ARDUINO-TEST";
+static char* systopic = "SiteWhere/system/123-ARDUINO-TEST";
 
 /** Handle MQTT subscription responses */
 void callback(char* topic, byte* payload, unsigned int length) {
-  if (strcmp(topic, system) == 0) {
+  if (strcmp(topic, systopic) == 0) {
     handleSystemCommand(payload, length);
-  } else if (strcmp(topic, command) == 0) {
+  } else if (strcmp(topic, cmdtopic) == 0) {
     // No custom commands in this example.
   }
 }
@@ -64,7 +66,7 @@ static void handleSystemCommand(byte* payload, unsigned int length) {
   if (pb_decode_delimited(&stream, Device_Header_fields, &header)) {
   
     // Handle a registration acknowledgement.
-    if (header.command == Device_Command_REGISTER_ACK) {
+    if (header.command == Device_Command_ACK_REGISTRATION) {
       Device_RegistrationAck ack;
       if (pb_decode_delimited(&stream, Device_RegistrationAck_fields, &ack)) {
         if (ack.state == Device_RegistrationAckState_NEW_REGISTRATION) {
@@ -96,8 +98,8 @@ void setup() {
     Serial.println(F("Connected to MQTT."));
     
     // Subscribe to command topics.
-    mqttClient.subscribe(command);
-    mqttClient.subscribe(system);
+    mqttClient.subscribe(cmdtopic);
+    mqttClient.subscribe(systopic);
 
     // Register device with SiteWhere.
     unsigned int len = 0;
@@ -117,9 +119,13 @@ void loop() {
   /** Only send events after registered and at most every five seconds */
   if ((registered) && ((millis() - lastEvent) > 5000)) {
     unsigned int len = 0;
-    if (len = sw_alert(hardwareId, "arduino.alive", "The Arduino is alive!", NULL, buffer, sizeof(buffer), NULL)) {
+    if (len = sw_alert(hardwareId, "arduino.alive", buffer, sizeof(buffer), NULL)) {
       mqttClient.publish(outbound, buffer, len);
       Serial.println(F("Sent alert."));
+    }
+    if (len = sw_acknowledge(hardwareId, "Acknowledged!", buffer, sizeof(buffer), NULL)) {
+      mqttClient.publish(outbound, buffer, len);
+      Serial.println(F("Sent acknowledgement."));
     }
     lastEvent = millis();
   }

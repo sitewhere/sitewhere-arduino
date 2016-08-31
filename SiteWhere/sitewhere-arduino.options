@@ -1,5 +1,42 @@
 # This file defines the nanopb-specific options for SiteWhere protos.
 
+#########################
+# Data Model Structures #
+#########################
+
+# Max lengths for Metadata.
+Model.Metadata.name 								max_size:30
+Model.Metadata.value 								max_size:30
+
+# Max lengths for DeviceLocation.
+Model.DeviceLocation.hardwareId 					max_size:40
+Model.DeviceLocation.metadata						max_count:3
+
+# Max lengths for DeviceAlert.
+Model.DeviceAlert.hardwareId 						max_size:40
+Model.DeviceAlert.alertType 						max_size:40
+Model.DeviceAlert.alertMessage 						max_size:70
+Model.DeviceAlert.metadata							max_count:3
+
+# Max lengths for Measurement.
+Model.Measurement.measurementId						max_size:30
+
+# Max lengths for DeviceMeasurements.
+Model.DeviceMeasurements.hardwareId 				max_size:40
+Model.DeviceMeasurements.measurement				max_count:5
+Model.DeviceMeasurements.metadata					max_count:3
+
+# Max lengths for DeviceStream.
+Model.DeviceStream.hardwareId 						max_size:40
+Model.DeviceStream.streamId 						max_size:40
+Model.DeviceStream.contentType 						max_size:40
+Model.DeviceStream.metadata							max_count:3
+
+# Max lengths for DeviceStreamData.
+Model.DeviceStreamData.hardwareId 					max_size:40
+Model.DeviceStreamData.streamId 					max_size:40
+Model.DeviceStreamData.metadata						max_count:3
+
 ############################
 # Fields Sent to SiteWhere #
 ############################
@@ -10,25 +47,15 @@ SiteWhere.Header.originator 						max_size:30
 # Max lengths for RegisterDevice.
 SiteWhere.RegisterDevice.hardwareId 				max_size:40
 SiteWhere.RegisterDevice.specificationToken 		max_size:40
+SiteWhere.RegisterDevice.siteToken 					max_size:40
 
 # Max lengths for Acknowledge.
 SiteWhere.Acknowledge.hardwareId 					max_size:40
 SiteWhere.Acknowledge.message 						max_size:70
 
-# Max lengths for DeviceLocation.
-SiteWhere.DeviceLocation.hardwareId 				max_size:40
-
-# Max lengths for DeviceAlert.
-SiteWhere.DeviceAlert.hardwareId 					max_size:40
-SiteWhere.DeviceAlert.alertType 					max_size:40
-SiteWhere.DeviceAlert.alertMessage 					max_size:70
-
-# Max lengths for Measurement.
-SiteWhere.Measurement.measurementId					max_size:30
-
-# Max lengths for DeviceMeasurements.
-SiteWhere.DeviceMeasurements.hardwareId 			max_size:40
-SiteWhere.DeviceMeasurements.measurement			max_count:5
+# Max lengths for DeviceStreamDataRequest.
+SiteWhere.DeviceStreamDataRequest.hardwareId 		max_size:40
+SiteWhere.DeviceStreamDataRequest.streamId 			max_size:40
 
 ##################################
 # Fields Received from SiteWhere #
@@ -41,3 +68,6 @@ Device.Header.nestedSpec 							max_size:40
 
 # Max lengths for registrationAck().
 Device.RegistrationAck.errorMessage 				max_size:70
+
+# Max lengths for deviceStreamAck().
+Device.DeviceStreamAck.streamId 					max_size:40

@@ -1,29 +1,14 @@
 option optimize_for = LITE_RUNTIME;
 
-// Arduino proto that specifies how data is sent to/from SiteWhere.
-//
-// NOTE: This proto has been converted to use fixed64 rather than float for doubles
-//       since arduino does not support a real double datatype.
-message SiteWhere {
+option java_package = "com.sitewhere.device.communication.protobuf.proto";
 
-	enum Command {REGISTER = 1; ACKNOWLEDGE = 2; DEVICELOCATION = 3; DEVICEALERT = 4; DEVICEMEASUREMENT = 5; } 
+// Model Objects
+message Model {
 	
-	// Header contains the command and originator.
-	message Header {
-		required Command command = 1;
-		optional string originator = 2;
-	}
-
-	// Register a device with SiteWhere.
-	message RegisterDevice {
-		required string hardwareId = 1;
-		required string specificationToken = 2;
-	}
-
-	// Acknowledge previous command.
-	message Acknowledge {
-		required string hardwareId = 1;
-		optional string message = 2;
+	// A single piece of metadata.
+	message Metadata {
+		required string name = 1;
+		required string value = 2;
 	}
 
 	// Report device location.
@@ -33,6 +18,7 @@ message SiteWhere {
 		required fixed64 longitude = 3;
 		optional fixed64 elevation = 4;
 		optional fixed64 eventDate = 5;
+		repeated Metadata metadata = 6;
 	}
 
 	// Report device alert.
@@ -41,6 +27,7 @@ message SiteWhere {
 		required string alertType = 2;
 		required string alertMessage = 3;
 		optional fixed64 eventDate = 4;
+		repeated Metadata metadata = 5;
 	}
 	
 	// A single measurement.
@@ -54,13 +41,78 @@ message SiteWhere {
 		required string hardwareId = 1;
 		repeated Measurement measurement = 2;
 		optional fixed64 eventDate = 3;
+		repeated Metadata metadata = 4;
+	}
+
+	// Create a device stream.
+	message DeviceStream {
+		required string hardwareId = 1;
+		required string streamId = 2;
+		required string contentType = 3;
+		repeated Metadata metadata = 4;
+	}
+
+	// A chunk of streaming data.
+	message DeviceStreamData {
+		required string hardwareId = 1;
+		required string streamId = 2;
+		required fixed64 sequenceNumber = 3;
+		required bytes data = 4;
+		optional fixed64 eventDate = 5;
+		repeated Metadata metadata = 6;
 	}
 }
 
-// Encapsulates data received from SiteWhere.
+// Commands sent from a device to SiteWhere.
+message SiteWhere {
+
+	enum Command {
+		SEND_REGISTRATION = 1;
+		SEND_ACKNOWLEDGEMENT = 2;
+		SEND_DEVICE_LOCATION = 3;
+		SEND_DEVICE_ALERT = 4;
+		SEND_DEVICE_MEASUREMENTS = 5;
+		SEND_DEVICE_STREAM = 6;
+		SEND_DEVICE_STREAM_DATA = 7;
+		REQUEST_DEVICE_STREAM_DATA = 8;
+	}
+
+	// Header contains the command and originator.
+	message Header {
+		required Command command = 1;
+		optional string originator = 2;
+	}
+
+	// Register a device with SiteWhere.
+	message RegisterDevice {
+		required string hardwareId = 1;
+		required string specificationToken = 2;
+		repeated Model.Metadata metadata = 3;
+		optional string siteToken = 4;
+	}
+
+	// Acknowledge previous command.
+	message Acknowledge {
+		required string hardwareId = 1;
+		optional string message = 2;
+	}
+
+	// Request for a chunk of data from a device stream.
+	message DeviceStreamDataRequest {
+		required string hardwareId = 1;
+		required string streamId = 2;
+		required fixed64 sequenceNumber = 3;
+	}
+}
+
+// Commands sent from SiteWhere to a device.
 message Device {
 
-	enum Command {REGISTER_ACK = 1; } 
+	enum Command {
+		ACK_REGISTRATION = 1;
+		ACK_DEVICE_STREAM = 2;
+		RECEIVE_DEVICE_STREAM_DATA = 3;
+	}
 	
 	// Header contains the command and originator.
 	message Header {
@@ -72,12 +124,21 @@ message Device {
 
 	// Enumeration of registation state responses.
 	enum RegistrationAckState {NEW_REGISTRATION = 1; ALREADY_REGISTERED = 2; REGISTRATION_ERROR = 3;} 
-	enum RegistrationAckError {INVALID_SPECIFICATION = 1; SITE_TOKEN_REQUIRED = 2; } 
+	enum RegistrationAckError {INVALID_SPECIFICATION = 1; SITE_TOKEN_REQUIRED = 2; NEW_DEVICES_NOT_ALLOWED = 3;}
 
 	// Acknowledges registration.
 	message RegistrationAck {
 		required RegistrationAckState state = 1;
 		optional RegistrationAckError errorType = 2;
 		optional string errorMessage = 3;
+	}
+
+	// Enumeration of device stream creation responses.
+	enum DeviceStreamAckState {STREAM_CREATED = 1; STREAM_EXISTS = 2; STREAM_FAILED = 3;}
+
+	// Acknowledges creation of device stream.
+	message DeviceStreamAck {
+		required string streamId = 1;
+		required DeviceStreamAckState state = 2;
 	}
 }

@@ -10,7 +10,7 @@ unsigned int sw_register(char* hardwareId, char* specificationToken, uint8_t* bu
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
-	header.command = SiteWhere_Command_REGISTER;
+	header.command = SiteWhere_Command_SEND_REGISTRATION;
 	if (originator != NULL) {
 		header.has_originator = true;
 		strcpy(header.originator, originator);
@@ -33,7 +33,7 @@ unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, si
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
-	header.command = SiteWhere_Command_ACKNOWLEDGE;
+	header.command = SiteWhere_Command_SEND_ACKNOWLEDGEMENT;
 	if (originator != NULL) {
 		header.has_originator = true;
 		strcpy(header.originator, originator);
@@ -60,7 +60,7 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
-	header.command = SiteWhere_Command_DEVICEMEASUREMENT;
+	header.command = SiteWhere_Command_SEND_DEVICE_MEASUREMENTS;
 	if (originator != NULL) {
 		header.has_originator = true;
 		strcpy(header.originator, originator);
@@ -69,10 +69,10 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 		return 0;
 	}
 
-	SiteWhere_DeviceMeasurements measurements = { };
+	Model_DeviceMeasurements measurements = { };
 	strcpy(measurements.hardwareId, hardwareId);
 
-	SiteWhere_Measurement measurement = { };
+	Model_Measurement measurement = { };
 	strcpy(measurement.measurementId, name);
 	measurement.measurementValue = float_to_double(value);
 	measurements.measurement[0] = measurement;
@@ -82,7 +82,7 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 		measurements.has_eventDate = true;
 		measurements.eventDate = eventDate;
 	}
-	if (!pb_encode_delimited(&stream, SiteWhere_DeviceMeasurements_fields, &measurements)) {
+	if (!pb_encode_delimited(&stream, Model_DeviceMeasurements_fields, &measurements)) {
 		return 0;
 	}
 
@@ -94,7 +94,7 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
-	header.command = SiteWhere_Command_DEVICELOCATION;
+	header.command = SiteWhere_Command_SEND_DEVICE_LOCATION;
 	if (originator != NULL) {
 		header.has_originator = true;
 		strcpy(header.originator, originator);
@@ -103,7 +103,7 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 		return 0;
 	}
 
-	SiteWhere_DeviceLocation location = { };
+	Model_DeviceLocation location = { };
 	strcpy(location.hardwareId, hardwareId);
 	location.latitude = float_to_double(lat);
 	location.longitude = float_to_double(lon);
@@ -114,7 +114,7 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 		location.has_eventDate = true;
 		location.eventDate = eventDate;
 	}
-	if (!pb_encode_delimited(&stream, SiteWhere_DeviceLocation_fields, &location)) {
+	if (!pb_encode_delimited(&stream, Model_DeviceLocation_fields, &location)) {
 		return 0;
 	}
 
@@ -126,7 +126,7 @@ unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
-	header.command = SiteWhere_Command_DEVICEALERT;
+	header.command = SiteWhere_Command_SEND_DEVICE_ALERT;
 	if (originator != NULL) {
 		header.has_originator = true;
 		strcpy(header.originator, originator);
@@ -135,7 +135,7 @@ unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int
 		return 0;
 	}
 
-	SiteWhere_DeviceAlert alert = { };
+	Model_DeviceAlert alert = { };
 	strcpy(alert.hardwareId, hardwareId);
 	strcpy(alert.alertType, alertType);
 	strcpy(alert.alertMessage, alertMessage);
@@ -143,7 +143,7 @@ unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int
 		alert.has_eventDate = true;
 		alert.eventDate = eventDate;
 	}
-	if (!pb_encode_delimited(&stream, SiteWhere_DeviceAlert_fields, &alert)) {
+	if (!pb_encode_delimited(&stream, Model_DeviceAlert_fields, &alert)) {
 		return 0;
 	}
 
