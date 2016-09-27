@@ -12,7 +12,7 @@
 
 // Update these with values suitable for your network.
 byte mac[]  = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte mqtt[] = { 192, 168, 1, 68 };
+byte mqtt[] = { 10, 0, 0, 32 };
 
 /** Callback function header */
 void callback(char* topic, byte* payload, unsigned int length);
@@ -122,6 +122,10 @@ void loop() {
     if (len = sw_alert(hardwareId, "arduino.alive", "The Arduino is alive!", NULL, buffer, sizeof(buffer), NULL)) {
       mqttClient.publish(outbound, buffer, len);
       Serial.println(F("Sent alert."));
+    }
+    if (len = sw_measurement(hardwareId, "engine.temp", 120.0, NULL, buffer, sizeof(buffer), NULL)) {
+      mqttClient.publish(outbound, buffer, len);
+      Serial.println(F("Sent measurement."));
     }
     if (len = sw_acknowledge(hardwareId, "Acknowledged!", buffer, sizeof(buffer), NULL)) {
       mqttClient.publish(outbound, buffer, len);
