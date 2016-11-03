@@ -23,15 +23,15 @@ unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, si
 
 /** Create an encoded measurement message for sending to SiteWhere */
 unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator);
+		uint8_t* buffer, size_t length, char* originator, bool updateState);
 
 /** Create an encoded location message for sending to SiteWhere */
 unsigned int sw_location(char* hardwareId, float lat, float lon, float elevation, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator);
+		uint8_t* buffer, size_t length, char* originator, bool updateState);
 
 /** Create an encoded alert message for sending to SiteWhere */
 unsigned int sw_alert(char* hardwareId, char* type, char* message, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator);
+		uint8_t* buffer, size_t length, char* originator, bool updateState);
 
 #ifdef __cplusplus
 } /* extern "C" */

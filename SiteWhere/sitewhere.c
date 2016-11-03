@@ -56,7 +56,7 @@ unsigned int sw_acknowledge(char* hardwareId, char* message, uint8_t* buffer, si
 }
 
 unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator) {
+		uint8_t* buffer, size_t length, char* originator, bool updateState) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
@@ -77,6 +77,8 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 	measurement.measurementValue = float_to_double(value);
 	measurements.measurement[0] = measurement;
 	measurements.measurement_count = 1;
+	measurements.has_updateState = true;
+	measurements.updateState = updateState;
 
 	if (eventDate != NULL) {
 		measurements.has_eventDate = true;
@@ -90,7 +92,7 @@ unsigned int sw_measurement(char* hardwareId, char* name, float value, int64_t e
 }
 
 unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator) {
+		uint8_t* buffer, size_t length, char* originator, bool updateState) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
@@ -109,6 +111,8 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 	location.longitude = float_to_double(lon);
 	location.elevation = float_to_double(ele);
 	location.has_elevation = true;
+	location.has_updateState = true;
+	location.updateState = updateState;
 
 	if (eventDate != NULL) {
 		location.has_eventDate = true;
@@ -122,7 +126,7 @@ unsigned int sw_location(char* hardwareId, float lat, float lon, float ele, int6
 }
 
 unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int64_t eventDate,
-		uint8_t* buffer, size_t length, char* originator) {
+		uint8_t* buffer, size_t length, char* originator, bool updateState) {
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, length);
 
 	SiteWhere_Header header = { };
@@ -139,6 +143,8 @@ unsigned int sw_alert(char* hardwareId, char* alertType, char* alertMessage, int
 	strcpy(alert.hardwareId, hardwareId);
 	strcpy(alert.alertType, alertType);
 	strcpy(alert.alertMessage, alertMessage);
+	alert.has_updateState = true;
+	alert.updateState = updateState;
 	if (eventDate != NULL) {
 		alert.has_eventDate = true;
 		alert.eventDate = eventDate;

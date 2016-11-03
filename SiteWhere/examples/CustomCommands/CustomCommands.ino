@@ -111,13 +111,13 @@ static void handlePing(ArduinoCustom_ping ping, char* originator) {
 /** Handle the 'testEvents' command */
 static void handleTestEvents(ArduinoCustom_testEvents testEvents, char* originator) {
   unsigned int len = 0;
-  if (len = sw_location(hardwareId, 33.755f, -84.39f, 0.0f, NULL, buffer, sizeof(buffer), originator)) {
+  if (len = sw_location(hardwareId, 33.755f, -84.39f, 0.0f, NULL, buffer, sizeof(buffer), originator, true)) {
     mqttClient.publish(outbound, buffer, len);
   }
-  if (len = sw_measurement(hardwareId, "engine.temp", 25.1f, NULL, buffer, sizeof(buffer), originator)) {
+  if (len = sw_measurement(hardwareId, "engine.temp", 25.1f, NULL, buffer, sizeof(buffer), originator, true)) {
     mqttClient.publish(outbound, buffer, len);
   }
-  if (len = sw_alert(hardwareId, "engine.overheat", "The engine is overheating!", NULL, buffer, sizeof(buffer), originator)) {
+  if (len = sw_alert(hardwareId, "engine.overheat", "The engine is overheating!", NULL, buffer, sizeof(buffer), originator, true)) {
     mqttClient.publish(outbound, buffer, len);
   }
 }
